@@ -8,6 +8,7 @@ spec = FlaskPydanticSpec('flask',
                          version='1.0')
 spec.register(app)
 
+
 @app.route('/verificar-data/<data>')
 def verificar_data(data):
     """
@@ -36,9 +37,9 @@ def verificar_data(data):
     """
 
     try:
-        data= datetime.strptime(data, "%d-%m-%Y")
+        data = datetime.strptime(data, "%d-%m-%Y")
         data_atual = datetime.now()
-        __repr_data__ = data_atual.strftime("%d/%m/%Y")
+        data_atual_str = data_atual.strftime("%d/%m/%Y")
 
         if data_atual == data:
             situacao = "presente"
@@ -49,14 +50,20 @@ def verificar_data(data):
         else:
             situacao = "futuro"
 
-        diferenca_dias = data_atual.day - data.day
-        diferenca_mes = data_atual.month - data.month
-        diferenca_ano = data_atual.year - data.year
-        return jsonify({"agora": __repr_data__, "situacao": situacao, "diferenca_dias": diferenca_dias,
-                        "diferenca_meses": diferenca_mes, "diferenca_anos": diferenca_ano})
+        diferenca_dias = abs(data_atual - data).days
+        diferenca_anos = abs(data_atual.year - data.year)
+        diferenca_meses = abs((data_atual.year - data.year)) * 12
+        return jsonify({
+            "agora": data_atual_str,
+            "situacao": situacao,
+            "diferenca_dias": str(diferenca_dias),
+            "diferenca_meses": str(diferenca_meses),
+            "diferenca_anos": str(diferenca_anos)
+        })
 
     except ValueError:
         return jsonify({'error': 'Formato de data incorrecto.'})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
